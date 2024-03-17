@@ -40,6 +40,7 @@ dependencies:
   another_flutter_splash_screen: ^1.2.0
   vcard_maintained: any
   url_launcher: ^6.2.5
+  android_alarm_manager_plus: ^3.0.4
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
