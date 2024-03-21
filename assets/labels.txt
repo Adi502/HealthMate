@@ -1,0 +1,15 @@
+0 Apple
+1 Banana
+2 Samosa
+3 Vadapav
+4 Misal
+5 Kalakand
+6 Balu Shahi
+7 Ghevar
+8 Kheer
+9 Jalebi
+10 Gulab Jamun
+11 Laddu
+12 Boondi
+13 Gajar Ka Halwa
+14 Ras Malai

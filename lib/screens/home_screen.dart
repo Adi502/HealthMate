@@ -1,5 +1,9 @@
+import 'dart:io';
+
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:healthmate/screens/image_detection.dart';
 import 'package:healthmate/screens/mood_reports.dart';
 import 'package:healthmate/screens/water_alerts.dart';
 import 'package:healthmate/screens/profile_screen.dart';
@@ -16,13 +20,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   late Animation<double> _animation;
   bool _isMenuOpen = false;
 
-  late CameraController controller;
-  late List<CameraDescription> _cameras;
-
   @override
   void initState() {
     super.initState();
-    camerainit();
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
@@ -30,31 +30,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _animation = Tween<double>(begin: -150, end: 150).animate(_controller);
   }
 
-  Future<void> camerainit() async {
-    _cameras = await availableCameras();
-    controller = CameraController(_cameras[0], ResolutionPreset.max);
-    await controller.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
-      setState(() {});
-    }).catchError((Object e) {
-      if (e is CameraException) {
-        switch (e.code) {
-          case 'CameraAccessDenied':
-          // Handle access errors here.
-            break;
-          default:
-          // Handle other errors here.
-            break;
-        }
-      }
-    });
-  }
-
   @override
   void dispose() {
-    controller.dispose();
+    Get.find<ScanController>().dispose(); // Dispose controller
     _controller.dispose();
     super.dispose();
   }
@@ -74,26 +52,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         child: FloatingActionButton(
           child: const Icon(Icons.camera),
           onPressed: () {
-            final image = controller.takePicture();
+            // Trigger image capture here
+            captureImage();
           },
         ),
       ),
       body: Stack(
         children: [
-          Container(
-            color: Colors.black,
-            child: CameraPreview(controller),
+          GetBuilder<ScanController>(
+            init: ScanController(),
+            builder: (controller) {
+              return controller.isCameraInitialized.value ? CameraPreview(controller.cameraController) : Text("Loading Preview....");
+            },
           ),
-          // Blur effect
-          // Positioned.fill(
-          //   child: BackdropFilter(
-          //     filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          //     child: Container(
-          //       color: Colors.transparent,
-          //     ),
-          //   ),
-          // ),
-          // Scanner Overlay with Moving Line
           Align(
             alignment: const Alignment(0, -0.1),
             child: Container(
@@ -117,13 +88,12 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               ),
             ),
           ),
-          // Navigation Icons with Names
           Positioned(
             bottom: 0,
             left: 0,
             child: Container(
               width: MediaQuery.of(context).size.width,
-              color: Colors.white, // Adjust opacity as needed
+              color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -133,7 +103,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       IconButton(
                         iconSize: 38,
                         color: const Color(0xFFC83E4D),
-                        icon: _isMenuOpen?const Icon(Icons.menu_open_rounded):const Icon(Icons.menu_rounded),
+                        icon: _isMenuOpen ? const Icon(Icons.menu_open_rounded) : const Icon(Icons.menu_rounded),
                         onPressed: () {
                           toggleMenu();
                         },
@@ -148,9 +118,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         iconSize: 38,
                         color: const Color(0xFFC83E4D),
                         icon: const Icon(Icons.image_search),
-                        onPressed: () {
-
-                        },
+                        onPressed: () {},
                       ),
                       const SizedBox(height: 2),
                       const Text('Scanner', style: TextStyle(color: Color(0xFFC83E4D))),
@@ -184,8 +152,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               bottom: 115,
               left: 0,
               child: Container(
-                width: 108, // Adjust width as needed
-                height: 244, // Maintain 16:9 aspect ratio
+                width: 108,
+                height: 244,
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -206,10 +174,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              WaterAlertsScreen(
-                                toggleMenu: toggleMenu,
-                              ),
+                          builder: (context) => WaterAlertsScreen(toggleMenu: toggleMenu),
                         ),
                       );
                     }),
@@ -229,21 +194,21 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           GestureDetector(
-            onTap: onTap, // Use the same onTap callback for both icon and text
+            onTap: onTap,
             child: Icon(
               icon,
-              color: const Color(0xFFC83E4D), // Adjust color as needed
+              color: const Color(0xFFC83E4D),
               size: 32,
             ),
           ),
           const SizedBox(height: 2),
           GestureDetector(
-            onTap: onTap, // Use the same onTap callback for both icon and text
+            onTap: onTap,
             child: Text(
               label,
-              textAlign: TextAlign.center, // Optionally, you can add this line for text alignment
+              textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Color(0xFFC83E4D), // Adjust color as needed
+                color: Color(0xFFC83E4D),
                 fontSize: 17,
               ),
             ),
@@ -251,6 +216,32 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         ],
       ),
     );
+  }
+
+  void captureImage() async {
+    try {
+      if (Get.find<ScanController>().isCameraInitialized.value) {
+        final controller = Get.find<ScanController>().cameraController;
+
+        final image = await controller.takePicture();
+        await classifyCapturedImage(image.path);
+      } else {
+        print('Camera not initialized');
+      }
+    } catch (e) {
+      print('Error capturing image: $e');
+    }
+  }
+
+
+  Future<void> classifyCapturedImage(String imagePath) async {
+    try {
+      final bytes = File(imagePath).readAsBytesSync();
+      final results = await Get.find<ScanController>().classifyImage(imagePath);
+      print('Classification results: $results');
+    } catch (e) {
+      print('Error classifying image: $e');
+    }
   }
 }
 
