@@ -1,4 +1,4 @@
-0 Apple
+0 Apples
 1 Banana
 2 Samosa
 3 Vadapav
@@ -7,7 +7,7 @@
 6 Balu Shahi
 7 Ghevar
 8 Kheer
-9 Jalebi
+9 Imarti
 10 Gulab Jamun
 11 Laddu
 12 Boondi

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:healthmate/screens/splashscreen.dart';
+import 'package:get/get.dart';
 
 
 void main() {
@@ -11,12 +12,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'HealthMate', // Your app's title
+    return GetMaterialApp(
+      title: 'HealthMate',
       theme: ThemeData(
-        primarySwatch: Colors.blue, // Define your app's theme
+        primarySwatch: Colors.blue,
       ),
-      home: const SplashScreen(), // Set the HomeScreen widget as the home screen
+      home: const SplashScreen(),
     );
   }
 }

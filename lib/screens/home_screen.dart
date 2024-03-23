@@ -7,6 +7,7 @@ import 'package:healthmate/screens/image_detection.dart';
 import 'package:healthmate/screens/mood_reports.dart';
 import 'package:healthmate/screens/water_alerts.dart';
 import 'package:healthmate/screens/profile_screen.dart';
+import 'package:healthmate/screens/tflite_results.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -26,13 +27,14 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
     _controller = AnimationController(
       vsync: this,
       duration: const Duration(seconds: 2),
-    )..repeat(reverse: true);
+    )
+      ..repeat(reverse: true);
     _animation = Tween<double>(begin: -150, end: 150).animate(_controller);
   }
 
   @override
   void dispose() {
-    Get.find<ScanController>().dispose(); // Dispose controller
+    Get.find<ImageDetection>().dispose(); // Dispose controller
     _controller.dispose();
     super.dispose();
   }
@@ -59,10 +61,11 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
       body: Stack(
         children: [
-          GetBuilder<ScanController>(
-            init: ScanController(),
+          GetBuilder<ImageDetection>(
+            init: ImageDetection(),
             builder: (controller) {
-              return controller.isCameraInitialized.value ? CameraPreview(controller.cameraController) : Text("Loading Preview....");
+              return controller.isCameraInitialized.value ? CameraPreview(
+                  controller.cameraController) : Text("Loading Preview....");
             },
           ),
           Align(
@@ -92,7 +95,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             bottom: 0,
             left: 0,
             child: Container(
-              width: MediaQuery.of(context).size.width,
+              width: MediaQuery
+                  .of(context)
+                  .size
+                  .width,
               color: Colors.white,
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
@@ -103,13 +109,16 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       IconButton(
                         iconSize: 38,
                         color: const Color(0xFFC83E4D),
-                        icon: _isMenuOpen ? const Icon(Icons.menu_open_rounded) : const Icon(Icons.menu_rounded),
+                        icon: _isMenuOpen
+                            ? const Icon(Icons.menu_open_rounded)
+                            : const Icon(Icons.menu_rounded),
                         onPressed: () {
                           toggleMenu();
                         },
                       ),
                       const SizedBox(height: 2),
-                      const Text('Menu', style: TextStyle(color: Color(0xFFC83E4D))),
+                      const Text(
+                          'Menu', style: TextStyle(color: Color(0xFFC83E4D))),
                     ],
                   ),
                   Column(
@@ -121,7 +130,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         onPressed: () {},
                       ),
                       const SizedBox(height: 2),
-                      const Text('Scanner', style: TextStyle(color: Color(0xFFC83E4D))),
+                      const Text('Scanner',
+                          style: TextStyle(color: Color(0xFFC83E4D))),
                     ],
                   ),
                   Column(
@@ -134,13 +144,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => ProfileScreen(toggleMenu: toggleMenu),
+                              builder: (context) =>
+                                  ProfileScreen(toggleMenu: toggleMenu),
                             ),
                           );
                         },
                       ),
                       const SizedBox(height: 2),
-                      const Text('Profile', style: TextStyle(color: Color(0xFFC83E4D))),
+                      const Text('Profile',
+                          style: TextStyle(color: Color(0xFFC83E4D))),
                     ],
                   ),
                 ],
@@ -157,7 +169,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20),
+                      topRight: Radius.circular(20)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -166,7 +179,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => MoodReportsScreen(toggleMenu: toggleMenu),
+                          builder: (context) =>
+                              MoodReportsScreen(toggleMenu: toggleMenu),
                         ),
                       );
                     }),
@@ -174,7 +188,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => WaterAlertsScreen(toggleMenu: toggleMenu),
+                          builder: (context) =>
+                              WaterAlertsScreen(toggleMenu: toggleMenu),
                         ),
                       );
                     }),
@@ -220,8 +235,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   void captureImage() async {
     try {
-      if (Get.find<ScanController>().isCameraInitialized.value) {
-        final controller = Get.find<ScanController>().cameraController;
+      if (Get
+          .find<ImageDetection>()
+          .isCameraInitialized
+          .value) {
+        final controller = Get
+            .find<ImageDetection>()
+            .cameraController;
 
         final image = await controller.takePicture();
         await classifyCapturedImage(image.path);
@@ -237,16 +257,19 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Future<void> classifyCapturedImage(String imagePath) async {
     try {
       final bytes = File(imagePath).readAsBytesSync();
-      final results = await Get.find<ScanController>().classifyImage(imagePath);
-      print('Classification results: $results');
+      final results = await Get.find<ImageDetection>().classifyImage(imagePath);
+
+      // Navigate to the TfliteResults page with the classification results
+      Get.to(
+          TfliteResults(result: results.isNotEmpty ? results[0] : 'Unknown'));
     } catch (e) {
       print('Error classifying image: $e');
     }
   }
-}
 
-void main() {
-  runApp(const MaterialApp(
-    home: HomeScreen(),
-  ));
+  void main() {
+    runApp(const MaterialApp(
+      home: HomeScreen(),
+    ));
+  }
 }

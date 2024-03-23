@@ -3,11 +3,9 @@ import 'package:flutter_tflite/flutter_tflite.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 
-class ScanController extends GetxController {
-
+class ImageDetection extends GetxController {
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     initCamera();
     initTFLite();
@@ -15,7 +13,6 @@ class ScanController extends GetxController {
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     cameraController.dispose();
     Tflite.close();
@@ -29,7 +26,6 @@ class ScanController extends GetxController {
 
   Future<List<String>> classifyImage(String imagePath) async {
     try {
-      // Run inference on the captured image
       final results = await Tflite.runModelOnImage(
         path: imagePath,
         numResults: 1,
@@ -39,15 +35,13 @@ class ScanController extends GetxController {
         asynch: true,
       );
 
-      // Process the output data to get the classification results
       final classificationResults = <String>[];
       if (results != null && results.isNotEmpty) {
         final label = results[0]['label'];
-        final confidence = results[0]['confidence'];
-        classificationResults.add('$label: $confidence');
+        final foodName = extractFoodName(label);
+        classificationResults.add('$foodName ');
       }
 
-      // Print the classification results
       print('Classification results: $classificationResults');
 
       return classificationResults;
@@ -56,6 +50,16 @@ class ScanController extends GetxController {
       return [];
     }
   }
+
+  String extractFoodName(String label) {
+    // Assuming the label format is "<index> <food name>"
+    final parts = label.split(' ');
+    if (parts.length > 1) {
+      return parts.sublist(1).join(' '); // Join all parts except the index
+    }
+    return label; // If label doesn't contain space-separated parts
+  }
+
 
   initCamera() async {
     if (await Permission.camera.request().isGranted) {
@@ -70,7 +74,7 @@ class ScanController extends GetxController {
           cameraCount++;
           if (cameraCount % 10 == 0) {
             cameraCount = 0;
-            //ObjectDetector(image);
+            // ObjectDetector(image);
           }
           update();
         });
@@ -92,23 +96,11 @@ class ScanController extends GetxController {
     );
   }
 
-  // ObjectDetector(CameraImage image) async {
-  //   var detector = await Tflite.runModelOnFrame(
-  //     bytesList: image.planes.map((e) {
-  //       return e.bytes;
-  //     }).toList(),
-  //     asynch: true,
-  //     imageHeight: image.height,
-  //     imageWidth: image.width,
-  //     imageMean: 127.5,
-  //     imageStd: 127.5,
-  //     numResults: 1,
-  //     rotation: 90,
-  //     threshold: 0.9,
-  //   );
-  //
-  //   if (detector != null) {
-  //     log("Result is $detector");
-  //   }
-  //}
+  void classifyFoodFromQuery(String query) {
+    String foodName = query.substring(3).trim();
+    print('Food name extracted from query: $foodName');
+    // Now you can use foodName for further processing or classification
+    // For example, you can call classifyImage(foodName) to classify the image.
+    // classifyImage(foodName);
+  }
 }
