@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_ringtone_player/flutter_ringtone_player.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:background_fetch/background_fetch.dart';
 import 'package:healthmate/screens/profile_screen.dart';
 import 'package:healthmate/screens/home_screen.dart';
 import 'package:healthmate/screens/mood_reports.dart';
@@ -22,6 +23,8 @@ class _WaterAlertsScreenState extends State<WaterAlertsScreen> {
   bool _isMenuOpen = false;
   int _selectedHours = 1; // Default value for hours
   String _selectedNotificationType = 'Send Notification';
+
+  late Timer _notificationTimer;
 
   final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
 
@@ -44,18 +47,33 @@ class _WaterAlertsScreenState extends State<WaterAlertsScreen> {
     await AndroidAlarmManager.initialize();
   }
 
-  void _sendNotification() {
-    int delayInSeconds = _selectedHours * 3600; // Convert hours to seconds
-    AndroidAlarmManager.periodic(Duration(seconds: delayInSeconds), 0, (alarmId) {
-      const AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
+  Future<void> _initializeBackgroundFetch() async {
+    var config = BackgroundFetchConfig(
+      minimumFetchInterval: 15, // Minimum fetch interval in minutes
+    );
+    await BackgroundFetch.configure(config, YourBackgroundFetchCallback);
+  }
+
+  void YourBackgroundFetchCallback(String taskId) async{
+    // Notification logic goes here
+    await _sendNotification();
+    BackgroundFetch.finish(taskId);
+  }
+
+  Future<void> _sendNotification() async{
+    int delayInSeconds = _selectedHours * 3600;
+
+    // Schedule the notification
+    _notificationTimer = Timer.periodic(Duration(seconds: delayInSeconds), (Timer timer) async {
+      final AndroidNotificationDetails androidPlatformChannelSpecifics = AndroidNotificationDetails(
         'your_channel_id',
         'your_channel_name',
         importance: Importance.max,
         priority: Priority.high,
         showWhen: false,
       );
-      const NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
-      flutterLocalNotificationsPlugin.show(
+      final NotificationDetails platformChannelSpecifics = NotificationDetails(android: androidPlatformChannelSpecifics);
+      await flutterLocalNotificationsPlugin.show(
         0, // Notification ID
         'Reminder', // Notification title
         'Drink water', // Notification body
@@ -66,7 +84,7 @@ class _WaterAlertsScreenState extends State<WaterAlertsScreen> {
 
 
   void _cancelAlerts() {
-    AndroidAlarmManager.cancel(0);
+    _notificationTimer.cancel();
   }
 
   void _ringAlarm() {

@@ -63,8 +63,16 @@ dependencies {
         implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.8.0") {
             because("kotlin-stdlib-jdk8 is now a part of kotlin-stdlib")
         }
+
     }
 }
+
+repositories {
+    maven {
+        url "${project(':background_fetch').projectDir}/libs"
+    }
+}
+
 
 flutter {
     source '../..'

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:healthmate/screens/Blink.dart';
 import 'package:healthmate/screens/image_detection.dart';
 import 'package:healthmate/screens/mood_reports.dart';
 import 'package:healthmate/screens/water_alerts.dart';
@@ -95,11 +96,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
             bottom: 0,
             left: 0,
             child: Container(
-              width: MediaQuery
-                  .of(context)
-                  .size
-                  .width,
-              color: Colors.white,
+              width: MediaQuery.of(context).size.width,
+              color: Colors.white, // Adjust opacity as needed
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -109,16 +107,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       IconButton(
                         iconSize: 38,
                         color: const Color(0xFFC83E4D),
-                        icon: _isMenuOpen
-                            ? const Icon(Icons.menu_open_rounded)
-                            : const Icon(Icons.menu_rounded),
+                        icon: _isMenuOpen ? const Icon(Icons.menu_open_rounded) : const Icon(Icons.menu_rounded),
                         onPressed: () {
                           toggleMenu();
                         },
                       ),
                       const SizedBox(height: 2),
-                      const Text(
-                          'Menu', style: TextStyle(color: Color(0xFFC83E4D))),
+                      const Text('Menu', style: TextStyle(color: Color(0xFFC83E4D))),
                     ],
                   ),
                   Column(
@@ -127,11 +122,17 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                         iconSize: 38,
                         color: const Color(0xFFC83E4D),
                         icon: const Icon(Icons.image_search),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const HomeScreen(),
+                            ),
+                          );
+                        },
                       ),
                       const SizedBox(height: 2),
-                      const Text('Scanner',
-                          style: TextStyle(color: Color(0xFFC83E4D))),
+                      const Text('Scanner', style: TextStyle(color: Color(0xFFC83E4D))),
                     ],
                   ),
                   Column(
@@ -144,15 +145,13 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) =>
-                                  ProfileScreen(toggleMenu: toggleMenu),
+                              builder: (context) => ProfileScreen(toggleMenu: toggleMenu),
                             ),
                           );
                         },
                       ),
                       const SizedBox(height: 2),
-                      const Text('Profile',
-                          style: TextStyle(color: Color(0xFFC83E4D))),
+                      const Text('Profile', style: TextStyle(color: Color(0xFFC83E4D))),
                     ],
                   ),
                 ],
@@ -161,16 +160,15 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           ),
           if (_isMenuOpen)
             Positioned(
-              bottom: 115,
+              bottom: 112,
               left: 0,
               child: Container(
-                width: 108,
-                height: 244,
+                width: 108, // Adjust width as needed
+                height: 262, // Maintain 16:9 aspect ratio
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: const BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20)),
+                  borderRadius: BorderRadius.only(topLeft: Radius.circular(20), topRight: Radius.circular(20)),
                 ),
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -179,8 +177,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              MoodReportsScreen(toggleMenu: toggleMenu),
+                          builder: (context) => MoodReportsScreen(toggleMenu: toggleMenu),
                         ),
                       );
                     }),
@@ -188,11 +185,18 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              WaterAlertsScreen(toggleMenu: toggleMenu),
+                          builder: (context) => WaterAlertsScreen(toggleMenu: toggleMenu),
                         ),
                       );
                     }),
+                    _buildMenuItem(Icons.remove_red_eye_outlined, 'Blink Alert', () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlinkAlertsScreen(toggleMenu: toggleMenu),
+                        ),
+                      );
+                    })
                   ],
                 ),
               ),
