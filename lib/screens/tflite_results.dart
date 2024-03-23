@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:healthmate/screens/exercise_recommendation.dart';
 import 'package:http/http.dart' as http;
 
 import 'home_screen.dart';
@@ -215,7 +216,15 @@ class _TfliteResultsState extends State<TfliteResults> {
                       Center(
                         child: ElevatedButton(
                           onPressed: () {
-
+                            double requiredCalories = nutritionalInfo.firstWhere((nutrient) => nutrient['name'] == 'Calories', orElse: () => {'amount': 0})['amount'];
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) {
+                                  return ExerciseRecommendation(requiredCalories: requiredCalories.toInt());
+                                },
+                              ),
+                            );
                           },
                           style: ButtonStyle(
                             backgroundColor: MaterialStateProperty.all<Color>(const Color(0xFFC83E4D)),

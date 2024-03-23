@@ -10,6 +10,8 @@ import 'package:cool_alert/cool_alert.dart';
 import 'dart:async';
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 
+import 'Blink.dart';
+
 class WaterAlertsScreen extends StatefulWidget {
   final VoidCallback toggleMenu;
 
@@ -475,11 +477,11 @@ class _WaterAlertsScreenState extends State<WaterAlertsScreen> {
           ),
           if (_isMenuOpen)
             Positioned(
-              bottom: 115,
+              bottom: 112,
               left: 0,
               child: Container(
                 width: 108, // Adjust width as needed
-                height: 244, // Maintain 16:9 aspect ratio
+                height: 262, // Maintain 16:9 aspect ratio
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -496,7 +498,16 @@ class _WaterAlertsScreenState extends State<WaterAlertsScreen> {
                         ),
                       );
                     }),
-                    _buildMenuItem(Icons.opacity, 'Water Alerts', () {}),
+                    _buildMenuItem(Icons.opacity, 'Water Alerts', () {
+                    }),
+                    _buildMenuItem(Icons.remove_red_eye_outlined, 'Blink Alert', () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlinkAlertsScreen(toggleMenu: toggleMenu),
+                        ),
+                      );
+                    })
                   ],
                 ),
               ),

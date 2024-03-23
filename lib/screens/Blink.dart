@@ -436,11 +436,11 @@ class _BlinkAlertsScreenState extends State<BlinkAlertsScreen> {
           ),
           if (_isMenuOpen)
             Positioned(
-              bottom: 115,
+              bottom: 112,
               left: 0,
               child: Container(
                 width: 108, // Adjust width as needed
-                height: 244, // Maintain 16:9 aspect ratio
+                height: 262, // Maintain 16:9 aspect ratio
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -465,7 +465,8 @@ class _BlinkAlertsScreenState extends State<BlinkAlertsScreen> {
                         ),
                       );
                     }),
-                    _buildMenuItem(Icons.remove_red_eye_outlined, 'Blink Alert', () {})
+                    _buildMenuItem(Icons.remove_red_eye_outlined, 'Blink Alert', () {
+                    })
                   ],
                 ),
               ),

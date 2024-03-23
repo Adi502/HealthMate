@@ -3,6 +3,8 @@ import 'package:healthmate/screens/mood_reports.dart';
 import 'package:healthmate/screens/home_screen.dart';
 import 'package:healthmate/screens/water_alerts.dart';
 
+import 'Blink.dart';
+
 class ProfileScreen extends StatefulWidget {
   final VoidCallback toggleMenu;
 
@@ -52,7 +54,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       IconButton(
                         iconSize: 38,
                         color: const Color(0xFFC83E4D),
-                        icon: _isMenuOpen?const Icon(Icons.menu_open_rounded):const Icon(Icons.menu_rounded),
+                        icon: _isMenuOpen ? const Icon(Icons.menu_open_rounded) : const Icon(Icons.menu_rounded),
                         onPressed: () {
                           toggleMenu();
                         },
@@ -87,7 +89,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         color: const Color(0xFFC83E4D),
                         icon: const Icon(Icons.person),
                         onPressed: () {
-
                         },
                       ),
                       const SizedBox(height: 2),
@@ -100,11 +101,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           if (_isMenuOpen)
             Positioned(
-              bottom: 115,
+              bottom: 112,
               left: 0,
               child: Container(
                 width: 108, // Adjust width as needed
-                height: 244, // Maintain 16:9 aspect ratio
+                height: 262, // Maintain 16:9 aspect ratio
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 decoration: const BoxDecoration(
                   color: Colors.white,
@@ -125,13 +126,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) =>
-                              WaterAlertsScreen(
-                                toggleMenu: toggleMenu,
-                              ),
+                          builder: (context) => WaterAlertsScreen(toggleMenu: toggleMenu),
                         ),
                       );
                     }),
+                    _buildMenuItem(Icons.remove_red_eye_outlined, 'Blink Alert', () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => BlinkAlertsScreen(toggleMenu: toggleMenu),
+                        ),
+                      );
+                    })
                   ],
                 ),
               ),
